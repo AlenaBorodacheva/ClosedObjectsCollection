@@ -8,7 +8,7 @@ namespace ClosedObjectsListTest
     public class ClosedObjectsListTest
     {
         [Fact]
-        public void HeadItemTest()
+        public void AddAndHeadItemTest()
         {
             var list = new ClosedObjectsList<SomeClass>();
             Assert.Throws<NullReferenceException>(() => list.Head);
@@ -18,7 +18,7 @@ namespace ClosedObjectsListTest
         }
 
         [Fact]
-        public void CurrentItemTest()
+        public void AddAndCurrentItemTest()
         {
             var list = new ClosedObjectsList<SomeClass>();
             Assert.Throws<NullReferenceException>(() => list.Current);
@@ -33,7 +33,7 @@ namespace ClosedObjectsListTest
         }
 
         [Fact]
-        public void PreviousItemTest()
+        public void AddAndPreviousItemTest()
         {
             var list = new ClosedObjectsList<SomeClass>();
             Assert.Throws<NullReferenceException>(() => list.Previous);
@@ -48,7 +48,7 @@ namespace ClosedObjectsListTest
         }
 
         [Fact]
-        public void NextItemTest()
+        public void AddAndNextItemTest()
         {
             var list = new ClosedObjectsList<SomeClass>();
             Assert.Throws<NullReferenceException>(() => list.Next);
@@ -66,40 +66,54 @@ namespace ClosedObjectsListTest
         public void CountTest()
         {
             var list = new ClosedObjectsList<SomeClass>();
-            Assert.Empty(list);
+            Assert.Equal(0, list.Count);
             list.Add(new SomeClass() { Value = 3 });
             list.Add(new SomeClass() { Value = 5 });
             Assert.Equal(2, list.Count);
         }
-
-        [Fact]
-        public void AddItemsTest()
-        {
-
-        }
-
+        
         [Fact]
         public void RemoveItemsTest()
         {
-
-        }
-
-        [Fact]
-        public void RemoveAtIndexTest()
-        {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            list.Add(elem1);
+            list.Add(elem2);
+            Assert.Contains(elem1, list);
+            list.RemoveAt(0);
+            Assert.DoesNotContain(elem1, list);
+            Assert.Equal(elem2, list.Head);
         }
 
         [Fact]
         public void GetByIndexTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            var elem3 = new SomeClass() { Value = 8 };
+            list.Add(elem1);
+            list.Add(elem2);
+            list.Add(elem3);
+            Assert.Equal(elem2, list[1]);
+            list.RemoveAt(0);
+            Assert.Equal(elem3, list[1]);
         }
 
         [Fact]
         public void EnumerableTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            list.Add(new SomeClass() { Value = 3 });
+            list.Add(new SomeClass() { Value = 5 });
+            list.Add(new SomeClass() { Value = 8 });
+            foreach (var item in list)
+            {
+                item.Value += 1;
+            }
+            Assert.Equal(4, list[0].Value);
+            Assert.Equal(9, list[2].Value);
         }
 
         [Fact]
@@ -113,39 +127,120 @@ namespace ClosedObjectsListTest
         }
 
         [Fact]
-        public void ContainsTest()
+        public void ContainsAndRemoveTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            var elem3 = new SomeClass() { Value = 8 };
+            list.Add(elem1);
+            list.Add(elem2);
+            Assert.Contains(elem1, list);
+            list.MoveNext();
+            Assert.Equal(list.Current, elem2);
+            list.Remove(elem2);
+            Assert.DoesNotContain(elem2, list);
+            Assert.Equal(list.Current, elem1);
         }
 
         [Fact]
         public void CopyToTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            var elem3 = new SomeClass() { Value = 8 };
+            list.Add(elem1);
+            list.Add(elem2);
+            list.Add(elem3);
+            SomeClass[] arr = new SomeClass[4];
+            list.CopyTo(arr, 1);
+            Assert.Equal(elem1, arr[1]);
+            Assert.Equal(elem3, arr[3]);
         }
 
         [Fact]
         public void IndexOfTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            var elem3 = new SomeClass() { Value = 8 };
+            list.Add(elem1);
+            list.Add(elem2);
+            list.Add(elem3);
+            Assert.Equal(1, list.IndexOf(elem2));
+            list.RemoveAt(0);
+            Assert.Equal(0, list.IndexOf(elem2));
         }
 
         [Fact]
         public void InsertTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            var elem1 = new SomeClass() { Value = 3 };
+            var elem2 = new SomeClass() { Value = 5 };
+            var elem3 = new SomeClass() { Value = 8 };
+            list.Add(elem1);
+            list.Add(elem3);
+            list.Insert(1, elem2);
+            Assert.Equal(elem1, list[0]);
+            Assert.Equal(elem2, list[1]);
+            Assert.Equal(elem3, list[2]);
         }
 
         [Fact]
         public void MoveNextTest()
         {
-
+            var list = new ClosedObjectsList<SomeClass>();
+            list.Add(new SomeClass() { Value = 3 });
+            list.Add(new SomeClass() { Value = 5 });
+            list.Add(new SomeClass() { Value = 8 });
+            Assert.Equal(3, list.Current.Value);
+            list.MoveNext(2);
+            Assert.Equal(8, list.Current.Value);
         }
 
         [Fact]
         public void MoveBackTest()
         {
+            var list = new ClosedObjectsList<SomeClass>();
+            list.Add(new SomeClass() { Value = 3 });
+            list.Add(new SomeClass() { Value = 5 });
+            list.Add(new SomeClass() { Value = 8 });
+            Assert.Equal(3, list.Current.Value);
+            list.MoveBack();
+            Assert.Equal(8, list.Current.Value);
+        }
 
+        [Fact]
+        public void EventDuringMoveNextTest()
+        {
+            var list = GetRefTypesList();
+            list.HeadReached += DoSomething;
+            int k = 5;
+            int count = list.Count;
+            eventCount = 0;
+            for (int i = 0; i < count * k; i++)
+            {
+                list.MoveNext();
+            }
+            Assert.Equal(k, eventCount);
+        }
+
+        [Fact]
+        public void EventDuringMoveBackTest()
+        {
+            var list = GetRefTypesList();
+            list.HeadReached += DoSomething;
+            int k = 5;
+            int count = list.Count;
+            eventCount = 0;
+            for (int i = 0; i < count * k; i++)
+            {
+                list.MoveBack();
+            }
+            Assert.Equal(k, eventCount);
         }
 
         private ClosedObjectsList<SomeClass> GetRefTypesList()
@@ -157,13 +252,10 @@ namespace ClosedObjectsListTest
             return list;
         }
 
-        private ClosedObjectsList<SomeStruct> GetValTypesList()
+        int eventCount;
+        private void DoSomething(object sender, SomeClass e)
         {
-            var list = new ClosedObjectsList<SomeStruct>();
-            list.Add(new SomeStruct() { Value = 2 });
-            list.Add(new SomeStruct() { Value = 5 });
-            list.Add(new SomeStruct() { Value = 8 });
-            return list;
+            eventCount++;
         }
     }
 }
