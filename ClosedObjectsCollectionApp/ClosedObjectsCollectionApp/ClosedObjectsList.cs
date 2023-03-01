@@ -72,14 +72,14 @@ namespace ClosedObjectsCollectionApp
                 _headNode.Previous = node;
             }
             Count++;
-            _currentIndex++;
         }
 
         public bool Remove(T item)
         {
             if (_headNode == null)
-                throw new ArgumentNullException();
+                return false;
             Node<T> removedItem = null;
+            int index = 0;
             var current = _headNode;
             do
             {
@@ -89,27 +89,27 @@ namespace ClosedObjectsCollectionApp
                     break;
                 }
                 current = current.Next;
+                index++;
             }
             while (current != _headNode);
             
-            if (removedItem != null)
+            if (removedItem == null) return false;
+            
+            if (Count == 1)
+                _headNode = null;
+            else
             {
-                if (Count == 1)
-                    _headNode = null;
-                else
+                if (removedItem == _headNode)
                 {
-                    if (removedItem == _headNode)
-                    {
-                        _headNode = _headNode.Next;
-                    }
-                    removedItem.Previous.Next = removedItem.Next;
-                    removedItem.Next.Previous = removedItem.Previous;
+                    _headNode = _headNode.Next;
                 }
-                Count--;
-                _currentIndex--;
-                return true;
+                removedItem.Previous.Next = removedItem.Next;
+                removedItem.Next.Previous = removedItem.Previous;
             }
-            return false;
+            Count--;
+            if (index <= _currentIndex)
+                _currentIndex--;
+            return true;
         }
 
         public void RemoveAt(int index)
@@ -132,7 +132,7 @@ namespace ClosedObjectsCollectionApp
             current.Next.Previous = current.Previous;
             current.Previous.Next = current.Next;
             Count--;
-            if(index >= _currentIndex)
+            if(index <= _currentIndex)
                 _currentIndex--;
         }
 
@@ -184,17 +184,55 @@ namespace ClosedObjectsCollectionApp
 
         public void Insert(int index, T item)
         {
-            throw new NotImplementedException();
+            if (index >= Count) throw new ArgumentOutOfRangeException();
+            var node = new Node<T>(item);
+            var current = _headNode;
+            for (int i = 0; i < index; i++)
+                current = current.Next;
+            node.Next = current;
+            node.Previous = current.Previous;
+            current.Previous.Next = node;
+            current.Previous = node;
+            if (index == 0) _headNode = current;
+            Count++;
+            if (index <= _currentIndex)
+                _currentIndex--;
         }
 
         public void MoveNext(int step = 1)
         {
-            throw new NotImplementedException();
+            if (Count == 0 || step == 0) return;
+
+            if (step < 0)
+            {
+                MoveBack(-step);
+                return;
+            }
+            var current = GetNodeByIndex(_currentIndex);
+            for (int i = 0; i < step; i++)
+            {
+                current = current.Next;
+                if (current.Equals(_headNode))
+                    HeadReached?.Invoke(this, Head);
+            }
         }
 
         public void MoveBack(int step = 1)
         {
-            throw new NotImplementedException();
+            if (Count == 0 || step == 0) return;
+
+            if (step < 0)
+            {
+                MoveNext(-step);
+                return;
+            }
+            var current = GetNodeByIndex(_currentIndex);
+            for (int i = 0; i < step; i++)
+            {
+                current = current.Previous;
+                if (current.Equals(_headNode))
+                    HeadReached?.Invoke(this, Head);
+            }
         }
 
         private Node<T> GetNodeByIndex(int index)
