@@ -5,22 +5,10 @@ namespace ClosedObjectsCollectionApp
 {
     public class ClosedObjectsList<T> : IClosedList<T>
     {
-        public T Head
-        {
-            get => _headNode.Data;
-        }
-        public T Current
-        {
-            get => GetNodeByIndex(_currentIndex).Data;
-        }
-        public T Previous
-        {
-            get => GetNodeByIndex(_currentIndex).Previous.Data;
-        }
-        public T Next
-        {
-            get => GetNodeByIndex(_currentIndex).Next.Data;
-        }
+        public T Head => _headNode.Data;
+        public T Current => GetNodeByIndex(_currentIndex).Data;
+        public T Previous => GetNodeByIndex(_currentIndex).Previous.Data;
+        public T Next => GetNodeByIndex(_currentIndex).Next.Data;
         public event EventHandler<T>? HeadReached;
         public int Count { get; private set; }
         public bool IsReadOnly { get; }
@@ -57,6 +45,8 @@ namespace ClosedObjectsCollectionApp
 
         public void Add(T item)
         {
+            if(item == null)
+                throw new ArgumentNullException();
             var node = new Node<T>(item);
             if (_headNode == null)
             {
@@ -76,6 +66,8 @@ namespace ClosedObjectsCollectionApp
 
         public bool Remove(T item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
             if (_headNode == null)
                 return false;
             Node<T> removedItem = null;
@@ -114,8 +106,7 @@ namespace ClosedObjectsCollectionApp
 
         public void RemoveAt(int index)
         {
-            if (_headNode == null)
-                throw new ArgumentNullException();
+            if (index >= Count) throw new ArgumentOutOfRangeException();
             var current = _headNode;
             var currentNode = GetNodeByIndex(_currentIndex);
             for (int i = 0; i < index; i++)
@@ -145,6 +136,8 @@ namespace ClosedObjectsCollectionApp
 
         public bool Contains(T item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
             if (_headNode == null) return false;
             Node<T> current = _headNode;
             do
@@ -167,6 +160,8 @@ namespace ClosedObjectsCollectionApp
 
         public int IndexOf(T item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
             if (_headNode == null) return -1;
             var current = _headNode;
             int count = 0;
@@ -212,6 +207,7 @@ namespace ClosedObjectsCollectionApp
             for (int i = 0; i < step; i++)
             {
                 current = current.Next;
+                _currentIndex++;
                 if (current.Equals(_headNode))
                     HeadReached?.Invoke(this, Head);
             }
@@ -230,6 +226,7 @@ namespace ClosedObjectsCollectionApp
             for (int i = 0; i < step; i++)
             {
                 current = current.Previous;
+                _currentIndex--;
                 if (current.Equals(_headNode))
                     HeadReached?.Invoke(this, Head);
             }
@@ -238,8 +235,12 @@ namespace ClosedObjectsCollectionApp
         private Node<T> GetNodeByIndex(int index)
         {
             var current = _headNode;
-            for (int i = 0; i < index; i++)
-                current = current.Next;
+            if(index > 0)
+                for (int i = 0; i < index; i++)
+                    current = current.Next;
+            else if(index < 0)
+                for (int i = 0; i < -index; i++)
+                    current = current.Previous;
             return current;
         }
     }
