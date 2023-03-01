@@ -1,2 +1,20 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using ClosedObjectsCollectionApp;
+
+ClosedObjectsList<int> myList = new ClosedObjectsList<int>();
+myList.Add(1);
+myList.Add(2);
+myList.Add(5);
+myList.Add(10);
+myList.Add(12);
+myList.MoveNext(3);
+var cur = myList.Current;
+myList.Remove(2);
+var cur2 = myList.Current;
+myList.Remove(12);
+var cur3 = myList.Current;
+myList.RemoveAt(1);
+myList.Add(8);
+myList.Add(12);
+myList.MoveNext(2);
+myList.MoveBack(3);
+var item = myList.Current;
